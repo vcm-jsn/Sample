@@ -26,7 +26,7 @@ class PartitionRenderer extends React.Component {
 }
 
 class TopicsV2 extends React.PureComponent {
-    construtor(props) {
+    constructor(props) {
         super(props);
         this.paginatorContainerRef = React.createRef();
         this.state = {
@@ -74,18 +74,16 @@ class TopicsV2 extends React.PureComponent {
     }
 
     getTopicsDetails(topicName, index) {
-        kafkaNode.listTopics((err, res)=>{
-            if (err) {
-                // Do something for error,
-                return
-            }
-            topicsMetadata = res[1]['metadata']
+        kafkaNode.listTopics((res)=>{            
+            topicsMetadata = res.data[1].metadata
             topicsData = []
             for (var topicName in topicsMetadata) {
                 let partitions = []
-                partitionsKeys = Object.keys(topicsMetadata[topicName])
+                let partitionsKeys = Object.keys(topicsMetadata[topicName])
                 partitions = partitionsKeys.map((partitionsKey)=>{
-                    topicsMetadata[topicName][partitionsKey]
+                    return{
+                        partitions: topicsMetadata[topicName][partitionsKey]
+                    }
                 })
                 topicsData.push({
                     topic: topicName,
@@ -111,8 +109,7 @@ class TopicsV2 extends React.PureComponent {
             <div className="ag-theme-balham" style= {{height: '600px', width: '800px'}}>
                 <div className="searchText" ><input type="text" onChange={this.handleSearchInputChange} placeholder="Search Topics"></input></div>
                 <AgGridReact pagination={true}
-                    paginationPageSize={this.state.pageSize}
-                    onPaginationChanged={this.handlePageChange}
+                    
                     columnDefs={this.state.columnDefs}
                     rowData={this.state.rowData}
                     onGridReady={this.onGridReady}>
@@ -122,4 +119,4 @@ class TopicsV2 extends React.PureComponent {
     }
 }
 
-export default Topics;
+export default TopicsV2;
