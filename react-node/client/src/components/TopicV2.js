@@ -7,6 +7,9 @@ import 'ag-grid-community/dist/styles/ag-grid.css'
 import 'ag-grid-community/dist/styles/ag-theme-balham.css'
 import { Link } from "react-router-dom";
 
+import Modal from 'react-modal';
+
+
 class PartitionRenderer extends React.Component {
     constructor(props){
         super(props)
@@ -14,14 +17,90 @@ class PartitionRenderer extends React.Component {
     render(){
         let partitions = this.props.value
         let partitionsView = partitions.map((partition)=>{
-            return (<div className="grid-partition-info">
-                <div>Partition : {partition.partition}</div>
-                <div>Leader : {partition.leader}</div>
-                <div>Replicas : {partition.replicas.join()}</div>
-                <div>ISR : {partition.isr.join()}</div>
-            </div>)
+            return (<tr className="grid-partition-info">
+                <td>{partition.partition}</td>
+                <td>{partition.leader}</td>
+                <td>{partition.replicas.join()}</td>
+                <td>{partition.isr.join()}</td>
+            </tr>)
         })
-        return partitionsView
+        return (
+            <table className="partition-table">
+                <tbody>
+                    <tr>
+                        <td>partition</td>
+                        <td>leader</td>
+                        <td>replicas.join()</td>
+                        <td>isr</td>
+                    </tr>
+                    {partitionsView}
+                </tbody>
+            </table>
+        )
+    }
+}
+
+class TopicNameRenderer extends React.createComponent {
+    constructor(props) {
+        super(props)
+        this.state = {
+            topicDetails: {},
+            modalIsOpen: false
+        }
+    }
+
+    openDetailsInfo = ()=>{
+        kafkaNode.describeConfigs(this.props.value, (err, topicDetails)=>{
+            this.setState({
+                topicDetails: topicDetails,
+                modalIsOpen: true
+            })
+        })
+    }
+    closeModal(){
+        this.setState({
+            modalIsOpen: false
+        })
+    }
+    afterOpenModal(){
+
+    }
+    render(){
+        return (
+            <div onClick={this.openDetailsInfo}>{this.props.value}</div>
+            <Modal
+                isOpen={modalIsOpen}
+                onAfterOpen={afterOpenModal}
+                onRequestClose={closeModal}
+                contentLabel="Topic Details">
+                {this.state.topicDetails.map((details)=>{
+                    return (
+                        <table>
+                            <thead>
+                                <tr>
+                                    <td>Config Name</td>
+                                    <td>Config Value</td>
+                                    <td>Config Source</td>
+                                    <td>Readonly</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {details.configEntries.map((entry)=>{
+                                    return (
+                                        <tr>
+                                            <td>{entry.configName}</td>
+                                            <td>{entry.configValue}</td>
+                                            <td>{entry.configSource}</td>
+                                            <td>{entry.readOnly}</td>
+                                        </tr>
+                                    )
+                                })
+                            </tbody>
+                        </table>
+                    )
+                })
+            </Modal>
+        )
     }
 }
 
@@ -37,6 +116,7 @@ class TopicsV2 extends React.PureComponent {
                     headerName: "Topic Name",
                     field: "topic",
                     filter: true,
+                    cellRenderer: 'topicNameRenderer',
                     tooltip: function(params) {
                         return (params.value);
                     }
@@ -45,9 +125,13 @@ class TopicsV2 extends React.PureComponent {
                     headerName: "Partitions",
                     field: "partitions",
                     filter: true,
-                    cellRenderer: PartitionRenderer
+                    cellRenderer: 'partitionRenderer'
                 },
-            ]
+            ],
+            frameworkComponents: {
+                partitionRenderer: PartitionRenderer,
+                topicNameRenderer: TopicNameRenderer
+            }
         }
         this.getTopicsDetails = this.getTopicsDetails.bind(this);
         this.onGridReady = this.onGridReady.bind(this);
