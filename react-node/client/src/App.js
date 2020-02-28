@@ -22,7 +22,7 @@ function App() {
       main:() =><Home/>
     },
     {
-      path:'getEmployees',
+      path:'/getEmployees',
       exact:true,
       main:() =><Employees/>
     },
@@ -34,7 +34,7 @@ function App() {
     {
       path:'/test',
       exact:true,
-      main:() =><H1> Test Page</H1>
+      main:() =><h1> Test Page</h1>
     },
 
   ]

@@ -69,7 +69,7 @@ const SidebarStyled = styled.div`
     
    `;
 
-   const sideBar = ({ show, setIsOpened}) =>{
+   const Sidebar = ({ show, setIsOpened}) =>{
         return(
         <SidebarStyled show={show ?1 : 0}>
          <SidebarWrapper>
@@ -82,7 +82,7 @@ const SidebarStyled = styled.div`
             }}
             ><span/></CloseIcon>
             <Link href="/">Home</Link>
-            <Link href="getEmployees">Employees</Link>
+            <Link href="/getEmployees">Employees</Link>
             <Link href="/test">Test</Link>            
          </SidebarWrapper>
         </SidebarStyled>          
