@@ -6,10 +6,12 @@ app.use(express.urlencoded({ extended:false}));
 const port = 5000;
 app.listen(port, () => `Server running on port ${port}`);
 const api_helper = require('./API_helper')
+const config = require("./config")
 
-//const kafka = require("kafka-node");
+const kafka = require("kafka-node");
 
-//const client = new kafka.KafkaClient({kafkaHost: 'hosts'})
+const client = new kafka.KafkaClient({kafkaHost: config.kafka.host})
+// You can get ssl details or eny other data from config also from config.
 
 // app.use(function(req,res,next){
 
