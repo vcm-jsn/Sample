@@ -240,17 +240,12 @@ class consumers extends React.PureComponent {
             for (var i in consumerGroups.data) {
                 if (!i.startsWith("_")) {
                     cgIds.push(i);
-                    rowData.push({
-                        key: i,
-                        value: consumerGroups.data[i]
-                    })
                 }
             }
             let currentCgIds = cgIds.slice(0, 10)
             this.setState({
                 currentCgIds:currentCgIds,
                 allCGIds: cgIds,
-                rowData: rowData,
                 isLoaded: true
             })
             this.getConsumerDetails(currentCgIds);
@@ -265,11 +260,16 @@ class consumers extends React.PureComponent {
         securePost("/getConsumerConfigs/", {
             cgIds: cgIds
         }).then((consumerDetails) => {
-            let cgData = consumerDetails.data[cgId];
+            let allData = []
+            cgIds.forEach((cgId)=>{
+                let cgData = consumerDetails.data[cgId];
+                allData.push({
+                    key: cgId,
+                    memberdetails: cgData
+                })
+            })
             this.setState((state) => {
-                state.rowData[index].memberDetails = cgData
-                this.api.setRowData(state.rowData)
-                return state
+                this.api.setRowData(allData)
             });
         }).catch(error => {
             console.log(error);
