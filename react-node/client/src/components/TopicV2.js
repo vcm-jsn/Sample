@@ -66,37 +66,63 @@ class TopicNameRenderer extends React.createComponent {
 
     }
     render(){
+        let partitions = Object.keys(this.state.topicDetails.latestOffset)
+        let topicName = this.props.value
+        let latestOffset = this.state.topicDetails.latestOffset
+        let eariestOffset = this.state.topicDetails.eariestOffset
         return (
             <div onClick={this.openDetailsInfo}>{this.props.value}</div>
             <Modal
-                isOpen={modalIsOpen}
-                onAfterOpen={afterOpenModal}
-                onRequestClose={closeModal}
+                isOpen={this.state.modalIsOpen}
+                onAfterOpen={this.afterOpenModal}
+                onRequestClose={this.closeModal}
                 contentLabel="Topic Details">
-                {this.state.topicDetails.map((details)=>{
+                {this.state.topicDetails.describeConfigDetails.map((details)=>{
                     return (
-                        <table>
-                            <thead>
-                                <tr>
-                                    <td>Config Name</td>
-                                    <td>Config Value</td>
-                                    <td>Config Source</td>
-                                    <td>Readonly</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {details.configEntries.map((entry)=>{
-                                    return (
-                                        <tr>
-                                            <td>{entry.configName}</td>
-                                            <td>{entry.configValue}</td>
-                                            <td>{entry.configSource}</td>
-                                            <td>{entry.readOnly}</td>
-                                        </tr>
-                                    )
-                                })
-                            </tbody>
-                        </table>
+                        <div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <td>Config Name</td>
+                                        <td>Config Value</td>
+                                        <td>Config Source</td>
+                                        <td>Readonly</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {details.configEntries.map((entry)=>{
+                                        return (
+                                            <tr>
+                                                <td>{entry.configName}</td>
+                                                <td>{entry.configValue}</td>
+                                                <td>{entry.configSource}</td>
+                                                <td>{entry.readOnly}</td>
+                                            </tr>
+                                        )
+                                    })
+                                </tbody>
+                            </table>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <th>Partitions</th>
+                                        <th>Current Offset</th>
+                                        <th>Earliest Offset</th>
+                                        <th>Somethings</th>
+                                    </tr>
+                                    {partitions.map((partition)=>{
+                                        return (
+                                            <tr>
+                                                <td>{topicName} - {partition}</td>
+                                                <td>{latestOffset[topicName][partition]}</td>
+                                                <td>{eariestOffset[topicName][partition]}</td>
+                                                <td>0</td>
+                                            </tr>
+                                        )
+                                    })
+                                </tbody>
+                            </table>
+                        </div>
                     )
                 })
             </Modal>
