@@ -122,19 +122,19 @@ class cGroupRenderer extends Component {
                             <table border = "1">
                                 <tbody>
                                 <tr>
-                                    <th>MemberId</th>
                                     <th>Topic</th>
+                                    <th>MemberId</th>
                                     <th>Partitions</th>
                                 </tr>
                                 {topicNames.map(topicName => {
                                     return (
                                         <tr>
-                                            <td>{member.memberId}</td>
                                             <td  onClick={this.fetchCommitAndOffsets.bind(this,
                                             this.props.data.key,
                                             topicName,memberDetails)}>
                                             <a>{topicName}</a>
                                             </td>             
+                                            <td>{member.memberId}</td>
                                             <td>{partitions[topicName].join()}</td>
                                             </tr>
                                     );
