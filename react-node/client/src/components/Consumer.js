@@ -26,7 +26,8 @@ class cGroupRenderer extends Component {
         super(props);
         this.state = {
             tableData: [],
-            modalIsOpen: false
+            modalIsOpen: false,
+            page: 0
         };
         this.openModal = this.openModal.bind(this);
         this.afterOpenModal = this.afterOpenModal.bind(this);
@@ -241,12 +242,16 @@ class consumers extends React.PureComponent {
                 if (!i.startsWith("_")) {
                     cgIds.push(i);
                 }
+                rowData.push({
+                    key: i
+                })
             }
             let currentCgIds = cgIds.slice(0, 10)
             this.setState({
                 currentCgIds:currentCgIds,
                 allCGIds: cgIds,
-                isLoaded: true
+                isLoaded: true,
+                rowData: rowData
             })
             this.getConsumerDetails(currentCgIds);
         }).catch(error => {
@@ -256,20 +261,18 @@ class consumers extends React.PureComponent {
     }
 
     getConsumerDetails(cgIds) {
-
+        let rowData = this.state.rowData
+        let page = this.state.page
         securePost("/getConsumerConfigs/", {
             cgIds: cgIds
         }).then((consumerDetails) => {
             let allData = []
-            cgIds.forEach((cgId)=>{
+            cgIds.forEach((cgId, i)=>{
                 let cgData = consumerDetails.data[cgId];
-                allData.push({
-                    key: cgId,
-                    memberdetails: cgData
-                })
+                rowData[page*10 + i][memberdetails] = cgData
             })
             this.setState((state) => {
-                this.api.setRowData(allData)
+                this.api.setRowData(rowData)
             });
         }).catch(error => {
             console.log(error);
