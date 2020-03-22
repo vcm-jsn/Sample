@@ -291,6 +291,9 @@ class consumers extends React.PureComponent {
 
     handlePaginationChanged = (page)=>{
         let currentCgIds = this.state.allCGIds.splice(page*10, 10)
+        this.setState({
+            page
+        })
         this.getConsumerDetails(currentCgIds);
     }
 
