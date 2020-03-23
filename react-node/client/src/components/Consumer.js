@@ -137,9 +137,8 @@ class cGroupRenderer extends Component {
                                 {topicNameMap[topicName].map(data => {
                                     return (
                                         <tr>
-                                            <td>{data.memberId}</td>
-                                            </td>             
-                                            <td>{data.partitions}</td>
+                                            <td>{data.memberId}</td>             
+                                            <td>{data.partitions.join()}</td>
                                         </tr>
                                     );
                                 })}
