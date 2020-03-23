@@ -47,7 +47,6 @@ class cGroupRenderer extends Component {
     afterOpenModal() {}
 
     fetchCommitAndOffsets = (groupId, topicName, data) => {
-
         let partitionsList = [];
         let members = data.members;
         members.forEach(member => {
@@ -105,39 +104,43 @@ class cGroupRenderer extends Component {
         if (members.length == 0) {
             return "Consumer State is Empty";
         }
+        let topicNameMap = {}
+        members.map((member)=>{
+            let partitions = member.memberAssignment.partitions;
+            let topicNames = Object.keys(partitions);
+            topicNames.forEach((topicName)=>{
+                if (!topicName) {return}
+                if (!topicNameMap[topicName]) {
+                    topicNameMap[topicName] = []
+                }
+                topicNameMap[topicName].push({
+                    partitions: partitions[topicName],
+                    memberId: member.id
+                })
+            })
+        })
+        let topicNames = Object.keys(topicNameMap)
         return (
             <React.Fragment>
                 <div>
-                    {members.map(member => {
-
-                        let partitions = member.memberAssignment.partitions;
-                        let topicNames = Object.keys(partitions);
-                        if(!partitions){
-                            return "";
-                        }
-                        if(!topicNames.length){
-                            return "";
-                        }
-                        topicNames = topicNames.filter(n =>n);
+                    {topicNames.map(topicName => {
                         return (
+                            <div onClick={this.fetchCommitAndOffsets.bind(this,
+                                    this.props.data.key,
+                                    topicName,memberDetails)}>Topic Name: {topicName} </div>
                             <table border = "1">
                                 <tbody>
                                 <tr>
-                                    <th>Topic</th>
                                     <th>MemberId</th>
                                     <th>Partitions</th>
                                 </tr>
-                                {topicNames.map(topicName => {
+                                {topicNameMap[topicName].map(data => {
                                     return (
                                         <tr>
-                                            <td  onClick={this.fetchCommitAndOffsets.bind(this,
-                                            this.props.data.key,
-                                            topicName,memberDetails)}>
-                                            <a>{topicName}</a>
+                                            <td>{data.memberId}</td>
                                             </td>             
-                                            <td>{member.memberId}</td>
-                                            <td>{partitions[topicName].join()}</td>
-                                            </tr>
+                                            <td>{data.partitions}</td>
+                                        </tr>
                                     );
                                 })}
                                 </tbody>
@@ -271,9 +274,9 @@ class consumers extends React.PureComponent {
                 let cgData = consumerDetails.data[cgId];
                 rowData[page*10 + i][memberdetails] = cgData
             })
-            this.setState((state) => {
-                this.api.setRowData(rowData)
-            });
+            setTimeout(()=>{
+               this.api.setRowData(rowData)     
+            }, 100)
         }).catch(error => {
             console.log(error);
             //toast.error("Error:" + error);
@@ -287,10 +290,18 @@ class consumers extends React.PureComponent {
     onGridReady(params) {
 
         this.api = params.api;
+        this.api.onPaginationChanged = this.handlePaginationChanged
     }
 
-    handlePaginationChanged = (page)=>{
-        let currentCgIds = this.state.allCGIds.splice(page*10, 10)
+    handlePaginationChanged = (event)=>{
+        if (!this.api) {
+            this.api = event.api
+        }
+        let page = event.api.paginationGetCurrentPage()
+        if (page == this.state.page) {
+            return
+        }
+        let currentCgIds = this.state.allCGIds.slice(page*10, 10)
         this.setState({
             page
         })
