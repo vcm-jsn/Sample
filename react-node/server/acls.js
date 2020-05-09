@@ -1,3 +1,14 @@
+var Buffermaker = require('buffermaker');
+
+function encodeRequestHeader (clientId, correlationId, apiKey, apiVersion) {
+  return new Buffermaker()
+    .Int16BE(apiKey)
+    .Int16BE(apiVersion || API_VERSION)
+    .Int32BE(correlationId)
+    .Int16BE(clientId.length)
+    .string(clientId);
+}
+
 client.getController((error, controller, controllerId)=>{
 	console.log(controllerId)
 	if (error) {
